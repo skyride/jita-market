@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'psqlextra',
     'django_celery_beat',
+    'django_filters',
 
     'apps.core',
     'apps.sde',

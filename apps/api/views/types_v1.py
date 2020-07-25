@@ -6,10 +6,12 @@ providing a details page about a type.
 """
 from typing import Dict
 
+import django_filters
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from rest_framework import serializers, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import serializers, viewsets, filters
 from drf_yasg.utils import swagger_auto_schema
 
 from apps.sde.models import Type, MarketGroup, Category, Group
@@ -31,6 +33,7 @@ class RegionPriceSerializer(serializers.ModelSerializer):
         return round(obj.average_sell * obj.sell_volume, 2)
 
 
+# List serializers
 class RegionPriceListSerializer(serializers.ListSerializer):
     def to_representation(self, related_manager):
         objects = [
@@ -39,7 +42,6 @@ class RegionPriceListSerializer(serializers.ListSerializer):
         return super().to_representation(objects)
 
 
-# List serializers
 class TypeListSerializer(serializers.ModelSerializer):
     """
     Basic serializer for list view.
@@ -49,6 +51,13 @@ class TypeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type
         fields = ["id", "name", "volume", "group_id", "market_group_id", "icon_url", "prices"]
+
+
+# List filters
+class TypeListFilterSet(django_filters.FilterSet):
+    market_group_id = django_filters.NumberFilter()
+    group_id = django_filters.NumberFilter()
+    category_id = django_filters.NumberFilter(field_name="group__category_id")
 
 
 # Detail serializers
@@ -93,6 +102,9 @@ class TypeV1ViewSet(viewsets.GenericViewSet,
             market_group_id__isnull=False)
         .prefetch_related("prices")
         .order_by("id"))
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = TypeListFilterSet
+    search_fields = ["name"]
 
     @swagger_auto_schema(
         tags=["Current Prices"],
