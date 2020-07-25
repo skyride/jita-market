@@ -31,12 +31,20 @@ class RegionPriceSerializer(serializers.ModelSerializer):
         return round(obj.average_sell * obj.sell_volume, 2)
 
 
+class RegionPriceListSerializer(serializers.ListSerializer):
+    def to_representation(self, related_manager):
+        objects = [
+            region_price for region_price in related_manager.all()
+            if region_price.region_id == 10000002]
+        return super().to_representation(objects)
+
+
 # List serializers
 class TypeListSerializer(serializers.ModelSerializer):
     """
     Basic serializer for list view.
     """
-    prices = RegionPriceSerializer(many=True)
+    prices = RegionPriceListSerializer(child=RegionPriceSerializer())
 
     class Meta:
         model = Type

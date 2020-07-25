@@ -97,7 +97,7 @@ CACHES = {
         'LOCATION': os.environ['REDIS_URL']
     },
 }
-CACHE_PERIOD = os.environ.get("CACHE_PERIOD", 0)
+CACHE_PERIOD = int(os.environ.get("CACHE_PERIOD", 1))
 
 
 # Celery
@@ -117,8 +117,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PARSER_CLASSES': [
         'apps.core.parsers.UJSONParser'],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 50
+    'DEFAULT_PAGINATION_CLASS': 'apps.api.pagination.LimitedLimitOffsetPagination',
+    'PAGE_SIZE': 50,
 }
 
 
