@@ -24,7 +24,6 @@ class RegionPrice(models.Model):
     sell_volume = models.BigIntegerField(default=0)
 
     created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ("region", "type")
