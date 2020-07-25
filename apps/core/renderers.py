@@ -12,12 +12,11 @@ class UJSONRenderer(BaseRenderer):
 
     media_type = 'application/json'
     format = 'json'
-    ensure_ascii = True
-    charset = None
+    charset = "utf-8"
 
     def render(self, data, *args, **kwargs):
 
         if data is None:
             return ""
 
-        return ujson.dumps(data, ensure_ascii=self.ensure_ascii)
+        return ujson.dumps(data)
