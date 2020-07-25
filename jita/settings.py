@@ -26,8 +26,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.postgres',
 
+    'rest_framework',
     'psqlextra',
+    'django_celery_beat',
 
+    'apps.core',
     'apps.sde',
     'apps.esi',
     'apps.pricing'
@@ -96,6 +99,14 @@ CACHES = {
 
 # Celery
 BROKER_URL = os.environ['BROKER_URL']
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'apps.core.renderers.UJSONRenderer',],
+    'DEFAULT_PARSER_CLASSES': [
+        'apps.core.parsers.UJSONParser',],
+}
 
 
 # Password validation

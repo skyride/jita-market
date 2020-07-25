@@ -1,11 +1,14 @@
 psycopg2==2.8.5
 redis==3.5.3
 django<3.1
+djangorestframework<3.12
 django-redis-cache<2.2
 django-postgres-extra==1.22
 celery==4.4.6
+django-celery-beat==2.0.0
+watchdog==0.10.3
 ujson==1.35
 PyYAML==5.3.1
-watchdog==0.10.3
+six==1.15.0
 argh==0.26.2
 requests==2.24.0

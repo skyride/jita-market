@@ -24,6 +24,7 @@ services:
     command: watchmedo auto-restart 
       --directory=./ --pattern=*.py --recursive --ignore-patterns=./env/* -- 
       celery worker -A jita -B -c 2 -l info
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler
     depends_on:
       - postgres
       - redis
