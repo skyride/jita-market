@@ -6,6 +6,8 @@ providing a details page about a type.
 """
 from typing import Dict
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework import serializers, viewsets
 
 from apps.sde.models import Type, MarketGroup, Category, Group
@@ -102,6 +104,14 @@ class TypeV1ViewSet(viewsets.GenericViewSet,
             market_group_id__isnull=False)
         .prefetch_related("prices")
         .order_by("id"))
+
+    @method_decorator(cache_page(30))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @method_decorator(cache_page(30))
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     def get_queryset(self):
         """Add select related for retrieve"""
