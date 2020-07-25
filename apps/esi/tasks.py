@@ -106,3 +106,20 @@ def update_region_prices(region_id: int):
     # Clear database and repopulate with new objects
     RegionPrice.objects.filter(region=region).delete()
     RegionPrice.objects.bulk_create(price_objects)
+
+
+@app.task
+def schedule_region_price_updates(kspace_only: bool = True):
+    """
+    Schedules a price update task for every region.
+    By default will only schedule kspace regions.
+    """
+    regions = Region.objects
+    if kspace_only:
+        # Filter to only k-space regions
+        regions = regions.filter(id__lt=11000001)
+
+    for region in regions.all():
+        update_region_prices.delay(region_id=region.id)
+
+    print(f"Scheduled price update tasks for {regions.count()} regions")
