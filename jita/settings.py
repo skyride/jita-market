@@ -103,6 +103,7 @@ BROKER_URL = os.environ['BROKER_URL']
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.BrowsableAPIRenderer',
         'apps.core.renderers.UJSONRenderer',],
     'DEFAULT_PARSER_CLASSES': [
         'apps.core.parsers.UJSONParser',],
