@@ -3,6 +3,8 @@ from typing import Dict, List
 from operator import attrgetter
 
 from django.db import transaction
+from psqlextra.query import ConflictAction
+from psqlextra.util import postgres_manager
 
 from jita.celery import app
 from apps.sde.models import Region, Type
@@ -42,6 +44,7 @@ def update_region_prices(region_id: int):
 
     # Iterate through types and upsert region pricing data
     print("Upserting region pricing data")
+    price_objects: List[RegionPrice] = []
     for type_ in Type.objects.filter(market_group__isnull=False):
         # Buy
         buy: List[MarketOrder] = sorted(
@@ -82,7 +85,7 @@ def update_region_prices(region_id: int):
         else:
             sell_volume, percentile_sell = 0, 0
 
-        RegionPrice.objects.update_or_create(
+        price_objects.append(RegionPrice(
             region=region,
             type=type_,
             max_buy=max([order.price for order in buy], default=0),
@@ -96,4 +99,8 @@ def update_region_prices(region_id: int):
                 sum([order.total for order in sell])
                 / (sum([order.volume_remain for order in sell]) or 1)),
             buy_volume=buy_volume,
-            sell_volume=sell_volume)
+            sell_volume=sell_volume))
+    
+    # Clear database and repopulate with new objects
+    RegionPrice.objects.filter(region=region).delete()
+    RegionPrice.objects.bulk_create(price_objects)
