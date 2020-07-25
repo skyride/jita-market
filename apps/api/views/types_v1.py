@@ -8,16 +8,26 @@ from typing import Dict
 
 from rest_framework import serializers, viewsets
 
-from apps.sde.models import Type
+from apps.sde.models import Type, MarketGroup, Category, Group
 from apps.pricing.models import RegionPrice
 
 
 class RegionPriceSerializer(serializers.ModelSerializer):
+    total_buy = serializers.SerializerMethodField()
+    total_sell = serializers.SerializerMethodField()
+
     class Meta:
         model = RegionPrice
         exclude = ["id", "region", "type", "created"]
 
+    def get_total_buy(self, obj: Type) -> float:
+        return round(obj.average_buy * obj.buy_volume, 2)
 
+    def get_total_sell(self, obj: Type) -> float:
+        return round(obj.average_sell * obj.sell_volume, 2)
+
+
+# List serializers
 class TypeListSerializer(serializers.ModelSerializer):
     """
     Basic serializer for list view.
@@ -42,6 +52,48 @@ class TypeListSerializer(serializers.ModelSerializer):
                     region_id: RegionPriceSerializer(region_price).data}
 
 
+# Detail serializers
+class MarketGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MarketGroup
+        fields = "__all__"
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+
+    class Meta:
+        model = Group
+        fields = "__all__"
+
+
+class TypeDetailSerializer(serializers.ModelSerializer):
+    """
+    More detailed serializer for retrieve/detail call.
+    """
+    market_group = MarketGroupSerializer()
+    group = GroupSerializer()
+    prices = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Type
+        fields = "__all__"
+
+    def get_prices(self, obj: Type) -> Dict[int, Dict[str, int]]:
+        """
+        Return a dict of prices for every region we have data on.
+        """
+        return {
+            region_price.region_id: RegionPriceSerializer(region_price).data
+            for region_price in obj.prices.all()}
+
+
 class TypeV1ViewSet(viewsets.GenericViewSet,
                     viewsets.mixins.ListModelMixin,
                     viewsets.mixins.RetrieveModelMixin):
@@ -51,6 +103,18 @@ class TypeV1ViewSet(viewsets.GenericViewSet,
         .prefetch_related("prices")
         .order_by("id"))
 
+    def get_queryset(self):
+        """Add select related for retrieve"""
+        query = super().get_queryset()
+        if self.action == "retrieve":
+            query = query.select_related(
+                "market_group",
+                "group",
+                "group__category")
+        return query
+
     def get_serializer_class(self):
         if self.action == "list":
             return TypeListSerializer
+        elif self.action == "retrieve":
+            return TypeDetailSerializer

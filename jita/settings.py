@@ -107,6 +107,9 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework.renderers.JSONRenderer',
         #'apps.core.renderers.UJSONRenderer',
+        #'rest_framework_xml.renderers.XMLRenderer',
+        #'rest_framework_csv.renderers.CSVRenderer',
+        #'drf_renderer_xlsx.renderers.XLSXRenderer',
     ],
     'DEFAULT_PARSER_CLASSES': [
         'apps.core.parsers.UJSONParser'],

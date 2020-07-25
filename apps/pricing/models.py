@@ -28,3 +28,4 @@ class RegionPrice(models.Model):
 
     class Meta:
         unique_together = ("region", "type")
+        ordering = ["id"]

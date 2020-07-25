@@ -26,6 +26,7 @@ ARG BROKER_URL=
 RUN ./manage.py collectstatic
 
 # Ops Parameters
+ENV PYTHONUNBUFFERED=1
 ENV WORKERS=2
 ENV PORT=8000
 
