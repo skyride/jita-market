@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
 
     'rest_framework',
+    'drf_yasg',
     'psqlextra',
     'django_celery_beat',
 
@@ -103,6 +104,8 @@ BROKER_URL = os.environ['BROKER_URL']
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.BrowsableAPIRenderer',
         'rest_framework.renderers.JSONRenderer',
@@ -115,6 +118,11 @@ REST_FRAMEWORK = {
         'apps.core.parsers.UJSONParser'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 50
+}
+
+
+SWAGGER_SETTINGS = {
+   'SECURITY_DEFINITIONS': {}
 }
 
 

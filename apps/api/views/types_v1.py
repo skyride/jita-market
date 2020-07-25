@@ -9,6 +9,7 @@ from typing import Dict
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import serializers, viewsets
+from drf_yasg.utils import swagger_auto_schema
 
 from apps.sde.models import Type, MarketGroup, Category, Group
 from apps.pricing.models import RegionPrice
@@ -20,7 +21,7 @@ class RegionPriceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RegionPrice
-        exclude = ["id", "region", "type", "created"]
+        exclude = ["id", "type", "created"]
 
     def get_total_buy(self, obj: Type) -> float:
         return round(obj.average_buy * obj.buy_volume, 2)
@@ -34,24 +35,11 @@ class TypeListSerializer(serializers.ModelSerializer):
     """
     Basic serializer for list view.
     """
-    prices = serializers.SerializerMethodField()
+    prices = RegionPriceSerializer(many=True)
 
     class Meta:
         model = Type
         fields = ["id", "name", "volume", "group_id", "market_group_id", "icon_url", "prices"]
-
-    def get_prices(self, obj: Type) -> Dict[int, Dict[str, int]]:
-        """
-        Return a dict of prices that only has the forge in it.
-        """
-        # Our query already prefetches the region pricing data. Iterating over
-        # it here manually keeps our list endpoint to 2 queries instead of n+1
-        # on the list endpoint.
-        region_id = 10000002
-        for region_price in obj.prices.all():
-            if region_price.region_id == region_id:
-                return {
-                    region_id: RegionPriceSerializer(region_price).data}
 
 
 # Detail serializers
@@ -81,19 +69,11 @@ class TypeDetailSerializer(serializers.ModelSerializer):
     """
     market_group = MarketGroupSerializer()
     group = GroupSerializer()
-    prices = serializers.SerializerMethodField()
+    prices = RegionPriceSerializer(many=True)
 
     class Meta:
         model = Type
         fields = "__all__"
-
-    def get_prices(self, obj: Type) -> Dict[int, Dict[str, int]]:
-        """
-        Return a dict of prices for every region we have data on.
-        """
-        return {
-            region_price.region_id: RegionPriceSerializer(region_price).data
-            for region_price in obj.prices.all()}
 
 
 class TypeV1ViewSet(viewsets.GenericViewSet,
@@ -105,10 +85,18 @@ class TypeV1ViewSet(viewsets.GenericViewSet,
         .prefetch_related("prices")
         .order_by("id"))
 
+    @swagger_auto_schema(
+        tags=["Current Prices"],
+        operation_summary="List Item types, some basic information and pricing data "
+                          "for The Forge regional market")
     @method_decorator(cache_page(30))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        tags=["Current Prices"],
+        operation_summary="Provides more detailed information and pricing data for "
+                          "every region for a single type")
     @method_decorator(cache_page(30))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
