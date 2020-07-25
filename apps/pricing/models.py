@@ -20,7 +20,8 @@ class RegionPrice(models.Model):
     average_sell = models.FloatField(default=0)
     percentile_buy = models.FloatField(default=0)
     percentile_sell = models.FloatField(default=0)
-    volume = models.IntegerField(default=0)
+    buy_volume = models.IntegerField(default=0)
+    sell_volume = models.IntegerField(default=0)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

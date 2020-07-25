@@ -1,13 +1,18 @@
 from collections import defaultdict
 from typing import Dict, List
+from operator import attrgetter
+
+from django.db import transaction
 
 from jita.celery import app
-from apps.sde.models import Region
+from apps.sde.models import Region, Type
+from apps.pricing.models import RegionPrice
 from .api import get_region_orders, OrderType 
 from .dataclasses import MarketOrder
 
 
 @app.task
+@transaction.atomic
 def update_region_prices(region_id: int):
     """
     Fetch and update pricing data for the region from ESI.
@@ -35,4 +40,60 @@ def update_region_prices(region_id: int):
             break
         i += 1
 
-    
+    # Iterate through types and upsert region pricing data
+    print("Upserting region pricing data")
+    for type_ in Type.objects.filter(market_group__isnull=False):
+        # Buy
+        buy: List[MarketOrder] = sorted(
+            orders[type_.id][OrderType.BUY],
+            key=attrgetter("price"),
+            reverse=True)
+        if len(buy) > 0:
+            buy_volume = sum([order.volume_remain for order in buy])
+
+            # Find the 95th percentile prices
+            # We do this by calculating the index of the specific within an order
+            # which will represent the 95th percentile, then iterating over the
+            # orders until we find the one containing it.
+            percentile_index = buy_volume * 0.05
+            for order in buy:
+                if order.volume_remain > percentile_index:
+                    percentile_buy = order.price
+                    break
+                else:
+                    percentile_index -= order.volume_remain
+        else:
+            buy_volume, percentile_buy = 0, 0
+
+        sell: List[MarketOrder] = sorted(
+            orders[type_.id][OrderType.SELL],
+            key=attrgetter("price"))
+        sell_volume = sum([order.volume_remain for order in sell])
+
+        if len(sell) > 0:
+            # Find the 95th percentile prices using the same method as buy
+            percentile_index = sell_volume * 0.05
+            for order in sell:
+                if order.volume_remain > percentile_index:
+                    percentile_sell = order.price
+                    break
+                else:
+                    percentile_index -= order.volume_remain
+        else:
+            sell_volume, percentile_sell = 0, 0
+
+        RegionPrice.objects.update_or_create(
+            region=region,
+            type=type_,
+            max_buy=max([order.price for order in buy], default=0),
+            max_sell=max([order.price for order in sell], default=0),
+            min_buy=min([order.price for order in buy], default=0),
+            min_sell=min([order.price for order in sell], default=0),
+            average_buy=(
+                sum([order.total for order in buy])
+                / (sum([order.volume_remain for order in buy]) or 1)),
+            average_sell=(
+                sum([order.total for order in sell])
+                / (sum([order.volume_remain for order in sell]) or 1)),
+            buy_volume=buy_volume,
+            sell_volume=sell_volume)
