@@ -22,10 +22,13 @@ ARG PGNAME=
 ARG PGUSER=
 ARG PGPASSWORD=
 ARG REDIS_URL=
+ARG BROKER_URL=
 RUN ./manage.py collectstatic
 
 # Ops Parameters
 ENV WORKERS=2
 ENV PORT=8000
+
+RUN mkdir /data
 
 CMD uwsgi --http :${PORT} --processes ${WORKERS} --static-map /static=/static --module jita.wsgi:application

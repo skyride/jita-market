@@ -23,7 +23,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'django.contrib.postgres',
+
+    'psqlextra',
+
+    'apps.sde'
 ]
 
 MIDDLEWARE = [
@@ -62,12 +67,16 @@ WSGI_APPLICATION = 'jita.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'psqlextra.backend',
         'HOST': os.environ['PGHOST'],
         'PORT': os.environ.get('PGPORT', 5432),
         'NAME': os.environ['PGNAME'],
         'USER': os.environ['PGUSER'],
         'PASSWORD': os.environ.get('PGPASSWORD', '')
+    },
+    'sde': {
+        'ENGINE': "django.db.backends.sqlite3",
+        'NAME': "/data/sqlite-latest.sqlite"
     }
 }
 
