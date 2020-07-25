@@ -2,7 +2,8 @@ import ujson
 
 from django.conf import settings
 from rest_framework.parsers import BaseParser, ParseError
-from rest_framework.renderers import JSONRenderer
+
+from .renderers import UJSONRenderer
 
 
 class UJSONParser(BaseParser):
@@ -10,8 +11,8 @@ class UJSONParser(BaseParser):
     Parses JSON-serialized data by ujson parser.
     """
 
-    media_type = 'application/json'
-    renderer_class = JSONRenderer
+    media_type = "application/json"
+    renderer_class = UJSONRenderer
 
     def parse(self, stream, media_type=None, parser_context=None):
         """
