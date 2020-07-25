@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'psqlextra',
 
     'apps.sde',
-    'apps.esi'
+    'apps.esi',
+    'apps.pricing'
 ]
 
 MIDDLEWARE = [
