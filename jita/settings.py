@@ -28,7 +28,8 @@ INSTALLED_APPS = [
 
     'psqlextra',
 
-    'apps.sde'
+    'apps.sde',
+    'apps.esi'
 ]
 
 MIDDLEWARE = [
@@ -93,7 +94,7 @@ CACHES = {
 
 
 # Celery
-CELERY_BROKER_URL = os.environ['BROKER_URL']
+BROKER_URL = os.environ['BROKER_URL']
 
 
 # Password validation

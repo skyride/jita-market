@@ -148,9 +148,6 @@ class Type(models.Model):
         null=True, on_delete=models.CASCADE)
     icon_id = models.IntegerField(null=True)
 
-    buy = models.DecimalField(max_digits=16, decimal_places=2, default=0)
-    sell = models.DecimalField(max_digits=16, decimal_places=2, default=0)
-
     def __str__(self):
         return self.name
 

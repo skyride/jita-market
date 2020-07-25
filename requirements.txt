@@ -4,6 +4,8 @@ django<3.1
 django-redis-cache<2.2
 django-postgres-extra==1.22
 celery==4.4.6
+ujson==1.35
 PyYAML==5.3.1
 watchdog==0.10.3
 argh==0.26.2
+requests==2.24.0
