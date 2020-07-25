@@ -6,6 +6,7 @@ providing a details page about a type.
 """
 from typing import Dict
 
+from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from rest_framework import serializers, viewsets
@@ -89,7 +90,7 @@ class TypeV1ViewSet(viewsets.GenericViewSet,
         tags=["Current Prices"],
         operation_summary="List Item types, some basic information and pricing data "
                           "for The Forge regional market")
-    @method_decorator(cache_page(30))
+    @method_decorator(cache_page(settings.CACHE_PERIOD))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -97,7 +98,7 @@ class TypeV1ViewSet(viewsets.GenericViewSet,
         tags=["Current Prices"],
         operation_summary="Provides more detailed information and pricing data for "
                           "every region for a single type")
-    @method_decorator(cache_page(30))
+    @method_decorator(cache_page(settings.CACHE_PERIOD))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 

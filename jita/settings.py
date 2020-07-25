@@ -97,6 +97,7 @@ CACHES = {
         'LOCATION': os.environ['REDIS_URL']
     },
 }
+CACHE_PERIOD = os.environ.get("CACHE_PERIOD", 0)
 
 
 # Celery
