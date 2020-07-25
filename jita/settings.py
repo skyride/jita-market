@@ -33,7 +33,8 @@ INSTALLED_APPS = [
     'apps.core',
     'apps.sde',
     'apps.esi',
-    'apps.pricing'
+    'apps.pricing',
+    'apps.api'
 ]
 
 MIDDLEWARE = [
@@ -104,9 +105,12 @@ BROKER_URL = os.environ['BROKER_URL']
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.JSONRenderer',
         'apps.core.renderers.UJSONRenderer',],
     'DEFAULT_PARSER_CLASSES': [
         'apps.core.parsers.UJSONParser',],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50
 }
 
 
