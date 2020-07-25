@@ -19,4 +19,4 @@ class UJSONRenderer(BaseRenderer):
         if data is None:
             return ""
 
-        return ujson.dumps(data)
+        return ujson.dumps(data, escape_forward_slashes=False)

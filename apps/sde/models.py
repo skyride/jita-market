@@ -151,14 +151,9 @@ class Type(models.Model):
     def __str__(self):
         return self.name
 
-    def image32(self):
-        return self._image_url(32)
-
-    def image64(self):
-        return self._image_url(64)
-
-    def _image_url(self, size):
-        return f"https://imageserver.eveonline.com/Render/{self.id}_{size}.png"
+    @property
+    def icon_url(self):
+        return f"https://images.evetech.net/types/{self.id}/icon"
 
 
 class AttributeCategory(models.Model):

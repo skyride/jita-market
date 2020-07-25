@@ -33,8 +33,8 @@ class TypeListSerializer(serializers.ModelSerializer):
         Return a dict of prices that only has the forge in it.
         """
         # Our query already prefetches the region pricing data. Iterating over
-        # it here manually keeps our list endpoint to a single query instead
-        # page size + 1.
+        # it here manually keeps our list endpoint to 2 queries instead of n+1
+        # on the list endpoint.
         region_id = 10000002
         for region_price in obj.prices.all():
             if region_price.region_id == region_id:

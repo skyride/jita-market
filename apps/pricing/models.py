@@ -25,5 +25,6 @@ class RegionPrice(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
 
+
     class Meta:
         unique_together = ("region", "type")
