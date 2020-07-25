@@ -94,10 +94,12 @@ def update_region_prices(region_id: int):
             min_sell=min([order.price for order in sell], default=0),
             average_buy=(
                 sum([order.total for order in buy])
-                / (sum([order.volume_remain for order in buy]) or 1)),
+                / (sum([order.volume_remain for order in buy]) or 1.0)),
             average_sell=(
                 sum([order.total for order in sell])
-                / (sum([order.volume_remain for order in sell]) or 1)),
+                / (sum([order.volume_remain for order in sell]) or 1.0)),
+            percentile_buy=percentile_buy,
+            percentile_sell=percentile_sell,
             buy_volume=buy_volume,
             sell_volume=sell_volume))
     

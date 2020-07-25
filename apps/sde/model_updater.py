@@ -88,7 +88,9 @@ class ModelUpdater:
 
         with postgres_manager(Model) as manager:
             for objects in chunker(get_objects(), 10000):
-                manager.on_conflict(['id'], ConflictAction.UPDATE).bulk_insert(list(objects))
+                (manager
+                    .on_conflict(['id'], ConflictAction.UPDATE)
+                    .bulk_insert(list(objects)))
         print("%s objects" % Model.objects.count())
 
 
