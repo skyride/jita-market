@@ -10,7 +10,7 @@ djangorestframework-csv==2.1.0
 drf-renderer-xlsx==0.3.7
 django-redis-cache<2.2
 django-postgres-extra==1.22
-celery==4.4.6
+celery==5.2.2
 django-celery-beat==2.0.0
 watchdog==0.10.3
 ujson==1.35
